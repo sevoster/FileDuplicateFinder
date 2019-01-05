@@ -16,7 +16,10 @@ Window {
         StartForm {
             id: startForm
             Layout.alignment: Qt.AlignHCenter
-            onStarted: console.log("started process: " + directoryPath + " " + "Recursive: " + (isRecursive ? "YES" : "NO"))
+            onStarted: {
+                console.log("started process: " + directoryPath + " " + "Recursive: " + (isRecursive ? "YES" : "NO"))
+                myModel.initFinder(directoryPath, isRecursive)
+            }
         }
     }
 }

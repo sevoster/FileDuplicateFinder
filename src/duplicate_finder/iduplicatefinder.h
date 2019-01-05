@@ -8,8 +8,8 @@ class IDuplicateFinder
 {
 public:
     virtual ~IDuplicateFinder() = default;
-    virtual QList<QString> getDuplicates() = 0;
-    virtual QList<QString> getFiles() = 0;
+    virtual QStringList getDuplicates() = 0;
+    virtual QStringList getFiles() = 0;
 };
 
 #endif // IDUPLICATEFINDER_H

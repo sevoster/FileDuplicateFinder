@@ -9,8 +9,12 @@ public:
     DuplicateFinder(const QString& dirPath, bool recursive);
 
     // IDuplicateFinder interface
-    virtual QList<QString> getDuplicates() override;
-    virtual QList<QString> getFiles() override;
+    virtual QStringList getDuplicates() override;
+    virtual QStringList getFiles() override;
+
+private:
+    QString m_dirPath;
+    bool m_isRecursive;
 };
 
 #endif // DUPLICATEFINDER_H

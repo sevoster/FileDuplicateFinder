@@ -1,5 +1,5 @@
-#ifndef FILECOMPARER_H
-#define FILECOMPARER_H
+#ifndef FILECOMPARATOR_H
+#define FILECOMPARATOR_H
 
 #include "ifilecomparator.h"
 
@@ -12,4 +12,4 @@ public:
     virtual bool areTheSame(QString filePath1, QString filePath2) override;
 };
 
-#endif // FILECOMPARER_H
+#endif // FILECOMPARATOR_H

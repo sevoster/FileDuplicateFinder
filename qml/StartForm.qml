@@ -4,6 +4,13 @@ import QtQuick.Dialogs 1.3
 import QtQuick.Controls 1.4
 
 ColumnLayout {
+    id: startForm
+
+    property alias directoryPath: directoryPathText.text
+    property alias isRecursive: recursive.checked
+
+    signal started()
+
     spacing: 10
 
     FileDialog {
@@ -20,21 +27,20 @@ ColumnLayout {
         TextField {
             id: directoryPathText
             placeholderText: qsTr("Path to a directory")
-            inputMethodHints: Qt.ImhUrlCharactersOnly
         }
 
         Button {
+            id: fileDialogBtn
             anchors.left: directoryPathText.right
             anchors.leftMargin: 10
-            id: fileDialogBtn
             text: "Browse"
             onClicked: fileDialog.open()
         }
     }
 
     CheckBox {
-        Layout.alignment: Qt.AlignHCenter
         id: recursive
+        Layout.alignment: Qt.AlignHCenter
         text: qsTr("Recursive")
         checked: false
     }
@@ -42,5 +48,6 @@ ColumnLayout {
     Button {
         Layout.alignment: Qt.AlignHCenter
         text: qsTr("Start")
+        onClicked: startForm.started()
     }
 }

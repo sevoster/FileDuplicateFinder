@@ -14,7 +14,9 @@ Window {
         anchors.fill: parent
 
         StartForm {
+            id: startForm
             Layout.alignment: Qt.AlignHCenter
+            onStarted: console.log("started process: " + directoryPath + " " + "Recursive: " + (isRecursive ? "YES" : "NO"))
         }
     }
 }

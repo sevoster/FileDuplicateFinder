@@ -8,6 +8,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_subdirectory(src)
+
 find_package(Qt5 COMPONENTS Core Quick REQUIRED)
 
 add_executable(${PROJECT_NAME} "main.cpp" "qml.qrc")

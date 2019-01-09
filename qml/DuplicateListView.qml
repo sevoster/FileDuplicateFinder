@@ -17,32 +17,48 @@ ColumnLayout {
             text: qsTr("Duplicate Groups")
             font.bold: true
             font.pointSize: 15
+            visible: duplicateView.count > 0
         }
     }
 
     ListView {
         id: duplicateView
-        Layout.alignment: Qt.AlignHCenter
         Layout.fillWidth: true
         Layout.fillHeight: true
 
-        spacing: 10
+        clip: true
+
+        spacing: 25
 
         delegate: Column {
             id: duplicateGroupText
+            clip: true
             width: parent.width
+
             Text {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
-                text: "Group " + index + ":\n"
+                text: "Group " + index
                 font.bold: true
-                font.pointSize: 7
+                font.pointSize: 10
             }
-            Text {
+            Item {
                 width: parent.width
-                horizontalAlignment: Text.AlignHCenter
-                text: duplicateGroup
+                height: 20
+            }
+
+            Repeater {
+                model: duplicateGroup
+
+                delegate: TextField {
+                    width: duplicateGroupText.width
+                    text: modelData
+                    readOnly: true
+                    selectByMouse: true
+                }
             }
         }
+
+        ScrollBar.vertical: ScrollBar {}
     }
 }

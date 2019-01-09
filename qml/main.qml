@@ -12,6 +12,8 @@ Window {
     ColumnLayout {
         anchors.fill: parent
 
+        spacing: 30
+
         StartForm {
             id: startForm
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter

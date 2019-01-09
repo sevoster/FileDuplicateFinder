@@ -42,7 +42,7 @@ QVariant DuplicatesModel::data(const QModelIndex &index, int role) const
     int row = index.row();
     switch (role) {
     case DuplicateDataRoles::DuplicateGroup:
-        return m_duplicates[row].join("\n");
+        return m_duplicates[row];
     }
 
     return QVariant();

@@ -47,7 +47,7 @@ ColumnLayout {
 
     Button {
         Layout.alignment: Qt.AlignHCenter
-        text: qsTr("Start")
+        text: qsTr("Analyze")
         onClicked: startForm.started()
     }
 }

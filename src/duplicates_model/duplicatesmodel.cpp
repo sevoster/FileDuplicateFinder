@@ -1,22 +1,28 @@
-#include "duplicatedatamodel.h"
+#include "duplicatesmodel.h"
 #include "duplicatefinder.h"
 #include "hashfilecomparator.h"
+#include "bytefilecomparator.h"
 
-DuplicateDataModel::DuplicateDataModel(QObject *parent) : QAbstractListModel (parent)
+DuplicatesModel::DuplicatesModel(QObject *parent) : QAbstractListModel (parent)
 {
 
 }
 
-void DuplicateDataModel::findDuplicates(const QUrl &directoryUrl, bool recursive)
+void DuplicatesModel::findDuplicates(const QUrl &directoryUrl, bool recursive)
 {
-    beginResetModel();
     QDir dir(directoryUrl.toLocalFile());
-    DuplicateFinder finder(dir, recursive, new HashFileComparator());
+    if (!dir.exists())
+    {
+
+    }
+    beginResetModel();
+    ByteFileComparator fileComparator;
+    DuplicateFinder finder(dir, recursive, &fileComparator);
     m_duplicates = finder.getDuplicates();
     endResetModel();
 }
 
-int DuplicateDataModel::rowCount(const QModelIndex &parent) const
+int DuplicatesModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
     {
@@ -26,7 +32,7 @@ int DuplicateDataModel::rowCount(const QModelIndex &parent) const
     return m_duplicates.size();
 }
 
-QVariant DuplicateDataModel::data(const QModelIndex &index, int role) const
+QVariant DuplicatesModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
     {
@@ -42,7 +48,7 @@ QVariant DuplicateDataModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QHash<int, QByteArray> DuplicateDataModel::roleNames() const
+QHash<int, QByteArray> DuplicatesModel::roleNames() const
 {
     QHash<int, QByteArray> roles = QAbstractListModel::roleNames();
     roles[DuplicateDataRoles::DuplicateGroup] = "duplicateGroup";

@@ -1,7 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include "duplicatedatamodel.h"
+#include "duplicatesmodel.h"
 
 int main(int argc, char *argv[])
 {
@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
-    DuplicateDataModel model;
+    DuplicatesModel model;
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("myModel", &model);

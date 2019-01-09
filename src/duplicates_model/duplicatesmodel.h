@@ -10,11 +10,11 @@ enum DuplicateDataRoles
     DuplicateGroup = Qt::UserRole + 1
 };
 
-class DuplicateDataModel : public QAbstractListModel
+class DuplicatesModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    DuplicateDataModel(QObject *parent = nullptr);
+    DuplicatesModel(QObject *parent = nullptr);
 
     Q_INVOKABLE void findDuplicates(const QUrl& dir, bool recursive);
     // QAbstractItemModel interface

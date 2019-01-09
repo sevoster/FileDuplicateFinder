@@ -6,7 +6,7 @@ import QtQuick.Controls 1.4
 ColumnLayout {
     id: startForm
 
-    property alias directoryPath: directoryPathText.text
+    property url directoryPath: ""
     property alias isRecursive: recursive.checked
 
     signal started()
@@ -19,6 +19,7 @@ ColumnLayout {
         selectFolder: true
         onAccepted: {
             directoryPathText.text = fileDialog.fileUrl
+            directoryPath = fileDialog.fileUrl
         }
     }
 
@@ -26,13 +27,12 @@ ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
         TextField {
             id: directoryPathText
+            readOnly: true
             placeholderText: qsTr("Path to a directory")
         }
 
         Button {
             id: fileDialogBtn
-            anchors.left: directoryPathText.right
-            anchors.leftMargin: 10
             text: "Browse"
             onClicked: fileDialog.open()
         }

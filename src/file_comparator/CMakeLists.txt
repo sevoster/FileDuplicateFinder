@@ -4,9 +4,14 @@ set(TARGET_NAME file_comparator)
 
 find_package(Qt5 COMPONENTS Core REQUIRED)
 
-set(SRC filecomparator.cpp)
+set(SRC hashfilecomparator.cpp
+        bytefilecomparator.cpp
+        basefilecomparator.cpp)
+
 set(HDR ifilecomparator.h
-        filecomparator.h)
+        hashfilecomparator.h
+        bytefilecomparator.h
+        basefilecomparator.h)
 
 add_library(${TARGET_NAME} ${SRC} ${HDR})
 target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

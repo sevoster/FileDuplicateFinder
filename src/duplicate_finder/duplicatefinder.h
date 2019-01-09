@@ -1,20 +1,23 @@
 #ifndef DUPLICATEFINDER_H
 #define DUPLICATEFINDER_H
 
+#include <QDir>
 #include "iduplicatefinder.h"
+#include "ifilecomparator.h"
 
 class DuplicateFinder : public IDuplicateFinder
 {
 public:
-    DuplicateFinder(const QString& dirPath, bool recursive);
+    DuplicateFinder(const QDir& dirPath, bool recursive, IFileComparator *fileComparator);
 
     // IDuplicateFinder interface
-    virtual QStringList getDuplicates() override;
+    virtual QList<QStringList> getDuplicates() override;
     virtual QStringList getFiles() override;
 
 private:
-    QString m_dirPath;
+    QDir m_dirPath;
     bool m_isRecursive;
+    IFileComparator *m_fileComparator;
 };
 
 #endif // DUPLICATEFINDER_H

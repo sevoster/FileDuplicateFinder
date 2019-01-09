@@ -1,8 +1,7 @@
 import QtQuick 2.9
 import QtQuick.Window 2.2
 import QtQuick.Layouts 1.12
-import QtQuick.Dialogs 1.3
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.4
 
 Window {
     visible: true
@@ -15,11 +14,17 @@ Window {
 
         StartForm {
             id: startForm
-            Layout.alignment: Qt.AlignHCenter
+            Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
             onStarted: {
-                console.log("started process: " + directoryPath + " " + "Recursive: " + (isRecursive ? "YES" : "NO"))
-                myModel.initFinder(directoryPath, isRecursive)
+                myModel.findDuplicates(directoryPath, isRecursive)
             }
+        }
+
+        DuplicateListView {
+            id: duplicateListView
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            model: myModel
         }
     }
 }

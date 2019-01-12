@@ -55,6 +55,7 @@ ColumnLayout {
                     text: modelData
                     readOnly: true
                     selectByMouse: true
+                    horizontalAlignment: Text.AlignHCenter
                 }
             }
         }

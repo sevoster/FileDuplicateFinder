@@ -16,8 +16,16 @@ bool HashFileComparator::areTheSame(QString filePath1, QString filePath2)
 
     QFile file1(filePath1);
     QFile file2(filePath2);
-    file1.open(QIODevice::ReadOnly);
-    file2.open(QIODevice::ReadOnly);
+
+    if (!file1.exists() || !file2.exists())
+    {
+        throw std::runtime_error("Files do not exist");
+    }
+
+    if (!file1.open(QIODevice::ReadOnly) || !file2.open(QIODevice::ReadOnly))
+    {
+        throw std::runtime_error("Failed to open files");
+    }
 
     QCryptographicHash hash1(m_algorithm);
     QCryptographicHash hash2(m_algorithm);

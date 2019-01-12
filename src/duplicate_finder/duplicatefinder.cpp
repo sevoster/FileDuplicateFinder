@@ -5,16 +5,17 @@
 #include <QDataStream>
 #include <QDirIterator>
 
-DuplicateFinder::DuplicateFinder(const QDir &dirPath, bool recursive, IFileComparator *fileComparator) :
-    m_dirPath(dirPath), m_isRecursive(recursive), m_fileComparator(fileComparator)
+DuplicateFinder::DuplicateFinder(std::unique_ptr<IFileComparator> fileComparator) :
+    m_fileComparator(std::move(fileComparator))
 {
 }
 
-QList<QStringList> DuplicateFinder::getDuplicates()
+QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dirPath, bool recursive)
 {
     QList<QStringList> duplicates;
     QStringList looked;
-    QDirIterator dirIterator(m_dirPath.path(), QDir::Files, m_isRecursive ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags);
+    QDirIterator::IteratorFlag iterFlag = recursive ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags;
+    QDirIterator dirIterator(dirPath.path(), QDir::Files, iterFlag);
 
     while (dirIterator.hasNext())
     {
@@ -22,7 +23,7 @@ QList<QStringList> DuplicateFinder::getDuplicates()
         if (looked.contains(filePath))
             continue;
         QStringList newDuplicatesList;
-        QDirIterator dirIteratorSecond(m_dirPath.path(), QDir::Files, m_isRecursive ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags);
+        QDirIterator dirIteratorSecond(dirPath.path(), QDir::Files, iterFlag);
         while (dirIteratorSecond.hasNext())
         {
             QString secondFilePath = dirIteratorSecond.next();
@@ -31,18 +32,13 @@ QList<QStringList> DuplicateFinder::getDuplicates()
             if (!m_fileComparator->areTheSame(filePath, secondFilePath))
                 continue;
             looked.append(secondFilePath);
-            newDuplicatesList.append(m_dirPath.relativeFilePath(secondFilePath));
+            newDuplicatesList.append(dirPath.relativeFilePath(secondFilePath));
         }
         if (!newDuplicatesList.empty())
         {
-            newDuplicatesList.append(m_dirPath.relativeFilePath(filePath));
+            newDuplicatesList.append(dirPath.relativeFilePath(filePath));
             duplicates.append(newDuplicatesList);
         }
     }
     return duplicates;
-}
-
-QStringList DuplicateFinder::getFiles()
-{
-    return m_dirPath.entryList(QDir::Files);
 }

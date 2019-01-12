@@ -8,16 +8,13 @@
 class DuplicateFinder : public IDuplicateFinder
 {
 public:
-    DuplicateFinder(const QDir& dirPath, bool recursive, IFileComparator *fileComparator);
+    DuplicateFinder(std::unique_ptr<IFileComparator> fileComparator);
 
     // IDuplicateFinder interface
-    virtual QList<QStringList> getDuplicates() override;
-    virtual QStringList getFiles() override;
+    virtual QList<QStringList> getDuplicates(const QDir& dirPath, bool recursive) override;
 
 private:
-    QDir m_dirPath;
-    bool m_isRecursive;
-    IFileComparator *m_fileComparator;
+    std::unique_ptr<IFileComparator> m_fileComparator;
 };
 
 #endif // DUPLICATEFINDER_H

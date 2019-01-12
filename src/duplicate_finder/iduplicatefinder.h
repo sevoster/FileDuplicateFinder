@@ -3,13 +3,13 @@
 
 #include <QList>
 #include <QString>
+#include <QDir>
 
 class IDuplicateFinder
 {
 public:
     virtual ~IDuplicateFinder() = default;
-    virtual QList<QStringList> getDuplicates() = 0;
-    virtual QStringList getFiles() = 0;
+    virtual QList<QStringList> getDuplicates(const QDir& dir, bool recursive) = 0;
 };
 
 #endif // IDUPLICATEFINDER_H

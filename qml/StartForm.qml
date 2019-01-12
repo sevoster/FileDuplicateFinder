@@ -1,13 +1,14 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.12
 import QtQuick.Dialogs 1.3
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.4
 
 ColumnLayout {
     id: startForm
 
     property url directoryPath: ""
     property alias isRecursive: recursive.checked
+    property alias algo: comparisonAlgoCombobox.currentText
 
     signal started()
 
@@ -38,11 +39,18 @@ ColumnLayout {
         }
     }
 
-    CheckBox {
-        id: recursive
+    RowLayout {
         Layout.alignment: Qt.AlignHCenter
-        text: qsTr("Recursive")
-        checked: false
+        ComboBox {
+            id: comparisonAlgoCombobox
+            model: myModel.algos
+        }
+        CheckBox {
+            id: recursive
+            Layout.alignment: Qt.AlignHCenter
+            text: qsTr("Recursive")
+            checked: false
+        }
     }
 
     Button {

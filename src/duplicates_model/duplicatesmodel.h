@@ -17,13 +17,13 @@ class DuplicatesModel : public QAbstractListModel
 {
     static QMap<QString, std::function<IFileComparator*()>> comparerAlgos;
 
-    Q_PROPERTY(QStringList algos READ getCompareAlgos CONSTANT)
+    Q_PROPERTY(QStringList comparatorNames READ getCompareAlgos CONSTANT)
 
     Q_OBJECT
 public:
     DuplicatesModel(QObject *parent = nullptr);
 
-    Q_INVOKABLE void findDuplicates(const QUrl& dir, bool recursive);
+    Q_INVOKABLE void findDuplicates(const QString &directoryPath, bool recursive);
     Q_INVOKABLE void initFinder(const QString& algoName);
 
     // QAbstractItemModel interface

@@ -38,8 +38,9 @@ ApplicationWindow {
         StartForm {
             id: startForm
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
+            comparatorsModel: myModel.comparatorNames
             onStarted: {
-                myModel.initFinder(algo)
+                myModel.initFinder(chosenComparator)
                 myModel.findDuplicates(directoryPath, isRecursive)
             }
         }

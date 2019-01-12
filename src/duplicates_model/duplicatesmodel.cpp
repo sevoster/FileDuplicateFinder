@@ -3,6 +3,8 @@
 #include "hashfilecomparator.h"
 #include "bytefilecomparator.h"
 
+#include <QDebug>
+
 QMap<QString, std::function<IFileComparator*()>> DuplicatesModel::comparerAlgos = {
 {"Hash", [] { return new HashFileComparator; }},
 {"Byte", [] { return new ByteFileComparator; }}
@@ -10,14 +12,26 @@ QMap<QString, std::function<IFileComparator*()>> DuplicatesModel::comparerAlgos 
 
 DuplicatesModel::DuplicatesModel(QObject *parent) : QAbstractListModel (parent), m_duplicateFinder(nullptr)
 {
-    m_duplicateFinder.reset(new DuplicateFinder(std::unique_ptr<HashFileComparator>(new HashFileComparator)));
 }
 
-void DuplicatesModel::findDuplicates(const QUrl &directoryUrl, bool recursive)
+void DuplicatesModel::findDuplicates(const QString &directoryPath, bool recursive)
 {
+    beginResetModel();
+    m_duplicates.clear();
+
     if (m_duplicateFinder == nullptr)
     {
         submitMessage("Duplicate Finder is not inited", MessageType::Error);
+        endResetModel();
+        return;
+    }
+
+    QUrl directoryUrl = QUrl::fromUserInput(directoryPath);
+
+    if (!directoryUrl.isValid() || directoryUrl.isEmpty() || !directoryUrl.isLocalFile())
+    {
+        submitMessage("Path is not valid", MessageType::Error);
+        endResetModel();
         return;
     }
 
@@ -25,11 +39,9 @@ void DuplicatesModel::findDuplicates(const QUrl &directoryUrl, bool recursive)
     if (!dir.exists())
     {
         submitMessage("Directory does not exist", MessageType::Error);
+        endResetModel();
         return;
     }
-
-    beginResetModel();
-    m_duplicates.clear();
 
     bool exception = false;
 

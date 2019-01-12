@@ -12,17 +12,22 @@ DuplicateFinder::DuplicateFinder(std::unique_ptr<IFileComparator> fileComparator
 
 QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dirPath, bool recursive)
 {
-    QList<QStringList> duplicates;
-    QStringList looked;
+    QList<QStringList> duplicateGroups;
+
     QDirIterator::IteratorFlag iterFlag = recursive ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags;
     QDirIterator dirIterator(dirPath.path(), QDir::Files, iterFlag);
 
     while (dirIterator.hasNext())
     {
         QString filePath = dirIterator.next();
-        if (looked.contains(filePath))
+        QString relativePath = dirPath.relativeFilePath(filePath);
+
+        auto foundIt = std::find_if(duplicateGroups.begin(), duplicateGroups.end(),
+                                    [relativePath](const QStringList& group) { return group.contains(relativePath); });
+        if (foundIt != duplicateGroups.end())
             continue;
-        QStringList newDuplicatesList;
+
+        QStringList newDuplicateGroup;
         QDirIterator dirIteratorSecond(dirPath.path(), QDir::Files, iterFlag);
         while (dirIteratorSecond.hasNext())
         {
@@ -31,14 +36,13 @@ QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dirPath, bool recu
                 continue;
             if (!m_fileComparator->areTheSame(filePath, secondFilePath))
                 continue;
-            looked.append(secondFilePath);
-            newDuplicatesList.append(dirPath.relativeFilePath(secondFilePath));
+            newDuplicateGroup.append(dirPath.relativeFilePath(secondFilePath));
         }
-        if (!newDuplicatesList.empty())
+        if (!newDuplicateGroup.empty())
         {
-            newDuplicatesList.append(dirPath.relativeFilePath(filePath));
-            duplicates.append(newDuplicatesList);
+            newDuplicateGroup.append(relativePath);
+            duplicateGroups.append(newDuplicateGroup);
         }
     }
-    return duplicates;
+    return duplicateGroups;
 }

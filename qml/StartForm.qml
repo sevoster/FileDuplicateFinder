@@ -6,9 +6,10 @@ import QtQuick.Controls 2.4
 ColumnLayout {
     id: startForm
 
-    property url directoryPath: ""
+    property alias directoryPath: directoryPathText.text
     property alias isRecursive: recursive.checked
-    property alias algo: comparisonAlgoCombobox.currentText
+    property alias chosenComparator: comparatorsCombobox.currentText
+    property alias comparatorsModel: comparatorsCombobox.model
 
     signal started()
 
@@ -20,7 +21,6 @@ ColumnLayout {
         selectFolder: true
         onAccepted: {
             directoryPathText.text = fileDialog.fileUrl
-            directoryPath = fileDialog.fileUrl
         }
     }
 
@@ -28,8 +28,8 @@ ColumnLayout {
         Layout.alignment: Qt.AlignHCenter
         TextField {
             id: directoryPathText
-            readOnly: true
             placeholderText: qsTr("Path to a directory")
+            selectByMouse: true
         }
 
         Button {
@@ -42,8 +42,7 @@ ColumnLayout {
     RowLayout {
         Layout.alignment: Qt.AlignHCenter
         ComboBox {
-            id: comparisonAlgoCombobox
-            model: myModel.algos
+            id: comparatorsCombobox
         }
         CheckBox {
             id: recursive

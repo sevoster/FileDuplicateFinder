@@ -6,9 +6,9 @@ import QtQuick.Controls 2.4
 ColumnLayout {
     id: startForm
 
-    property alias directoryPath: directoryPathText.text
-    property alias isRecursive: recursive.checked
-    property alias chosenComparator: comparatorsCombobox.currentText
+    readonly property alias directoryPath: directoryPathText.text
+    readonly property alias isRecursive: recursive.checked
+    readonly property alias chosenComparator: comparatorsCombobox.currentText
     property alias comparatorsModel: comparatorsCombobox.model
 
     signal started()

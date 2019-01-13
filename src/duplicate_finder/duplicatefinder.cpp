@@ -4,45 +4,53 @@
 #include <QFileInfo>
 #include <QDataStream>
 #include <QDirIterator>
+#include <QMap>
 
 DuplicateFinder::DuplicateFinder(std::unique_ptr<IFileComparator> fileComparator) :
     m_fileComparator(std::move(fileComparator))
 {
 }
 
-QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dirPath, bool recursive)
+QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dir, bool recursive)
 {
-    QList<QStringList> duplicateGroups;
+    if (!dir.exists())
+    {
+        return QList<QStringList>();
+    }
 
     QDirIterator::IteratorFlag iterFlag = recursive ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags;
-    QDirIterator dirIterator(dirPath.path(), QDir::Files, iterFlag);
+    QDirIterator dirIterator(dir.path(), QDir::Files, iterFlag);
+
+    QMap<QString, QStringList> duplicateGroups;
+    QStringList prevUniqueFiles;
 
     while (dirIterator.hasNext())
     {
         QString filePath = dirIterator.next();
-        QString relativePath = dirPath.relativeFilePath(filePath);
+        QString relativePath = dir.relativeFilePath(filePath);
 
-        auto foundIt = std::find_if(duplicateGroups.begin(), duplicateGroups.end(),
-                                    [relativePath](const QStringList& group) { return group.contains(relativePath); });
-        if (foundIt != duplicateGroups.end())
-            continue;
+        bool isDuplicate = false;
 
-        QStringList newDuplicateGroup;
-        QDirIterator dirIteratorSecond(dirPath.path(), QDir::Files, iterFlag);
-        while (dirIteratorSecond.hasNext())
+        for (auto prevFilePath : prevUniqueFiles)
         {
-            QString secondFilePath = dirIteratorSecond.next();
-            if (filePath == secondFilePath)
-                continue;
-            if (!m_fileComparator->areTheSame(filePath, secondFilePath))
-                continue;
-            newDuplicateGroup.append(dirPath.relativeFilePath(secondFilePath));
+            if (m_fileComparator->areTheSame(filePath, prevFilePath))
+            {
+                duplicateGroups[prevFilePath].append(relativePath);
+                isDuplicate = true;
+                break;
+            }
         }
-        if (!newDuplicateGroup.empty())
+
+        if (!isDuplicate)
         {
-            newDuplicateGroup.append(relativePath);
-            duplicateGroups.append(newDuplicateGroup);
+            prevUniqueFiles.append(filePath);
         }
     }
-    return duplicateGroups;
+
+    for (auto origFile : duplicateGroups.keys())
+    {
+        duplicateGroups[origFile].append(dir.relativeFilePath(origFile));
+    }
+
+    return duplicateGroups.values();
 }

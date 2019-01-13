@@ -22,9 +22,15 @@ make
 
 ## Usage
 * Run DuplicateFinder
-* Choose directory and file comparator
+* Choose directory
+* Choose finder
+  * __All__ - find duplicates for all files in all subdirectories
+  * __Per Directory__ - find duplicates only per directory
+* Choose comparator
+  * __Byte__ - compare by byte content
+  * __Hash__ - compare by SHA1 hash
 * Click "Analyze" button
-* As result you will see duplicate groups with relative paths
+* As result you will see groups of duplicates
 ![Application](doc/images/app.png)
 
 ## Known limitations

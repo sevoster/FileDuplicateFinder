@@ -27,7 +27,6 @@ QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dir, bool recursiv
     while (dirIterator.hasNext())
     {
         QString filePath = dirIterator.next();
-        QString relativePath = dir.relativeFilePath(filePath);
 
         bool isDuplicate = false;
 
@@ -35,7 +34,7 @@ QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dir, bool recursiv
         {
             if (m_fileComparator->areTheSame(filePath, prevFilePath))
             {
-                duplicateGroups[prevFilePath].append(relativePath);
+                duplicateGroups[prevFilePath].append(filePath);
                 isDuplicate = true;
                 break;
             }
@@ -49,7 +48,7 @@ QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dir, bool recursiv
 
     for (auto origFile : duplicateGroups.keys())
     {
-        duplicateGroups[origFile].append(dir.relativeFilePath(origFile));
+        duplicateGroups[origFile].append(origFile);
     }
 
     return duplicateGroups.values();

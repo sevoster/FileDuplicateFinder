@@ -9,9 +9,11 @@ ColumnLayout {
     readonly property alias directoryPath: directoryPathText.text
     readonly property alias isRecursive: recursive.checked
     readonly property alias chosenComparator: comparatorsCombobox.currentText
+    readonly property alias chosenFinder: findersCombobox.currentText
     property alias comparatorsModel: comparatorsCombobox.model
+    property alias findersModel: findersCombobox.model
 
-    signal started()
+    signal started
 
     spacing: 10
 
@@ -41,9 +43,27 @@ ColumnLayout {
 
     RowLayout {
         Layout.alignment: Qt.AlignHCenter
-        ComboBox {
-            id: comparatorsCombobox
+
+        Column {
+            spacing: 10
+
+            Label {
+                text: qsTr("Finder:")
+            }
+
+            ComboBox {
+                id: findersCombobox
+            }
+
+            Label {
+                text: qsTr("Comparator:")
+            }
+
+            ComboBox {
+                id: comparatorsCombobox
+            }
         }
+
         CheckBox {
             id: recursive
             Layout.alignment: Qt.AlignHCenter

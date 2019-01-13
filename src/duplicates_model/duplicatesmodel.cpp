@@ -1,23 +1,29 @@
 #include "duplicatesmodel.h"
 #include "duplicatefinder.h"
+#include "concurrentduplicatefinder.h"
 #include "hashfilecomparator.h"
 #include "bytefilecomparator.h"
 
-#include <QDebug>
 
 QMap<QString, std::function<IFileComparator*()>> DuplicatesModel::comparerAlgos = {
 {"Hash", [] { return new HashFileComparator; }},
 {"Byte", [] { return new ByteFileComparator; }}
 };
 
-DuplicatesModel::DuplicatesModel(QObject *parent) : QAbstractListModel (parent), m_duplicateFinder(nullptr)
+QMap<QString, std::function<IDuplicateFinder*(std::unique_ptr<IFileComparator>)>> DuplicatesModel::finderTypes = {
+{"All", [] (std::unique_ptr<IFileComparator> comparator) { return new DuplicateFinder(std::move(comparator)); }},
+{"Per Directory", [] (std::unique_ptr<IFileComparator> comparator) { return new ConcurrentDuplicateFinder(std::move(comparator)); }}
+};
+
+DuplicatesModel::DuplicatesModel(QObject *parent) : QAbstractListModel (parent), m_duplicateFinder(nullptr), m_isRelative(false)
 {
+    connect(this, SIGNAL(isRelativeChanged()), this, SLOT(onIsRelativeChanged()));
 }
 
 void DuplicatesModel::findDuplicates(const QString &directoryPath, bool recursive)
 {
     beginResetModel();
-    m_duplicates.clear();
+    m_duplicateGroups.clear();
 
     if (m_duplicateFinder == nullptr)
     {
@@ -35,8 +41,8 @@ void DuplicatesModel::findDuplicates(const QString &directoryPath, bool recursiv
         return;
     }
 
-    QDir dir(directoryUrl.toLocalFile());
-    if (!dir.exists())
+    m_workDir = QDir(directoryUrl.toLocalFile());
+    if (!m_workDir.exists())
     {
         submitMessage("Directory does not exist", MessageType::Error);
         endResetModel();
@@ -46,37 +52,46 @@ void DuplicatesModel::findDuplicates(const QString &directoryPath, bool recursiv
     bool exception = false;
 
     try {
-        m_duplicates = m_duplicateFinder->getDuplicates(dir, recursive);
+        m_duplicateGroups = m_duplicateFinder->getDuplicates(m_workDir, recursive);
     } catch (const std::runtime_error& e) {
         submitMessage(e.what(), MessageType::Error);
         exception = true;
     }
+
+    if (m_isRelative)
+        updatePaths();
 
     endResetModel();
 
     if (exception)
         return;
 
-    if (m_duplicates.empty())
+    if (m_duplicateGroups.empty())
     {
         submitMessage("No duplicates found");
     }
     else
     {
-        submitMessage(QString("Found %1 duplicate groups").arg(m_duplicates.size()));
+        submitMessage(QString("Found %1 duplicate groups").arg(m_duplicateGroups.size()));
     }
 }
 
-void DuplicatesModel::initFinder(const QString &algoName)
+void DuplicatesModel::initFinder(const QString& finderType, const QString &algoName)
 {
+    if (!finderTypes.contains(finderType))
+    {
+        submitMessage("Unsupported finder type", MessageType::Error);
+        return;
+    }
+
     if (!comparerAlgos.contains(algoName))
     {
-        submitMessage("Unsupported comparer algorithm");
+        submitMessage("Unsupported comparer algorithm", MessageType::Error);
         return;
     }
 
     std::unique_ptr<IFileComparator> comparator(comparerAlgos[algoName]());
-    m_duplicateFinder.reset(new DuplicateFinder(std::move(comparator)));
+    m_duplicateFinder.reset(finderTypes[finderType](std::move(comparator)));
 }
 
 int DuplicatesModel::rowCount(const QModelIndex &parent) const
@@ -86,7 +101,7 @@ int DuplicatesModel::rowCount(const QModelIndex &parent) const
         return 0;
     }
 
-    return m_duplicates.size();
+    return m_duplicateGroups.size();
 }
 
 QVariant DuplicatesModel::data(const QModelIndex &index, int role) const
@@ -99,7 +114,7 @@ QVariant DuplicatesModel::data(const QModelIndex &index, int role) const
     int row = index.row();
     switch (role) {
     case DuplicateDataRoles::DuplicateGroup:
-        return m_duplicates[row];
+        return m_duplicateGroups[row];
     }
 
     return QVariant();
@@ -115,6 +130,20 @@ QHash<int, QByteArray> DuplicatesModel::roleNames() const
 QStringList DuplicatesModel::getCompareAlgos() const
 {
     return comparerAlgos.keys();
+}
+
+QStringList DuplicatesModel::getFinderTypes() const
+{
+    return finderTypes.keys();
+}
+
+void DuplicatesModel::onIsRelativeChanged()
+{
+    beginResetModel();
+
+    updatePaths();
+
+    endResetModel();
 }
 
 void DuplicatesModel::submitMessage(const QString &message, MessageType type)
@@ -133,4 +162,15 @@ void DuplicatesModel::submitMessage(const QString &message, MessageType type)
         break;
     }
     emit submittedMessage(prefix + ": " + message);
+}
+
+void DuplicatesModel::updatePaths()
+{
+    for (auto& group : m_duplicateGroups)
+    {
+        for (auto& filePath : group)
+        {
+            filePath = m_isRelative ? m_workDir.relativeFilePath(filePath) : m_workDir.absoluteFilePath(filePath);
+        }
+    }
 }

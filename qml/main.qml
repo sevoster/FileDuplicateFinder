@@ -39,8 +39,9 @@ ApplicationWindow {
             id: startForm
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
             comparatorsModel: myModel.comparatorNames
+            findersModel: myModel.finderTypes
             onStarted: {
-                myModel.initFinder(chosenComparator)
+                myModel.initFinder(chosenFinder, chosenComparator)
                 myModel.findDuplicates(directoryPath, isRecursive)
             }
         }
@@ -50,6 +51,10 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             model: myModel
+
+            onIsRelativePathChanged: {
+                myModel.isRelative = isRelativePath
+            }
         }
     }
 }

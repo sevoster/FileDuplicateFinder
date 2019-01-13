@@ -25,6 +25,7 @@ make
 * Choose directory and file comparator
 * Click "Analyze" button
 * As result you will see duplicate groups with relative paths
+![Application](doc/images/app.png)
 
 ## Known limitations
 * Application may be slow on a big amount of files (or file sizes)

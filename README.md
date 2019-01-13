@@ -27,11 +27,11 @@ make
   * __All__ - find duplicates for all files in all subdirectories
   * __Per Directory__ - find duplicates only per directory
 * Choose comparator
-  * __Byte__ - compare by byte content
+  * __Byte__ - compare by content
   * __Hash__ - compare by SHA1 hash
 * Click "Analyze" button
 * As result you will see groups of duplicates
 ![Application](doc/images/app.png)
 
 ## Known limitations
-* Application may be slow on a big amount of files (or file sizes)
+* Application may be slow on a big amount of files or huge sizes

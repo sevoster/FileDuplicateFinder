@@ -1,5 +1,5 @@
 # File Duplicate Finder
-Application to find file duplicates in a directory
+Application to find file duplicates in two directories
 
 ## Prerequisites
 * CMake >= 3.1
@@ -24,8 +24,8 @@ make
 * Run DuplicateFinder
 * Choose directory
 * Choose finder
-  * __All__ - find duplicates for all files in all subdirectories
-  * __Per Directory__ - find duplicates only per directory
+  * __Sequential__ - find duplicates sequentially
+  * __Concurrent__ - find duplicates in parallel (per file in left folder)
 * Choose comparator
   * __Byte__ - compare by content
   * __Hash__ - compare by SHA1 hash
@@ -35,3 +35,4 @@ make
 
 ## Known limitations
 * Application may be slow on a big amount of files or huge sizes
+* Usage of Hash comparator loads whole file in memory (better not use for big files)

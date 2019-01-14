@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 
 ColumnLayout {
     property var duplicatesModel: null
@@ -39,16 +40,28 @@ ColumnLayout {
 
         spacing: 25
 
+        function getRowColor(rowIndex) {
+            return rowIndex % 2 === 0 ? "#dddddd" : "white"
+        }
+
         delegate: Row {
             id: duplicateGroupText
             clip: true
             width: parent.width
+
+            property int modelIndex: index
 
             TextField {
                 text: leftFile
                 width: duplicateGroupText.width / 2
                 readOnly: true
                 selectByMouse: true
+                style: TextFieldStyle {
+                    background: Rectangle {
+                        color: duplicateView.getRowColor(modelIndex)
+                        border.width: 1
+                    }
+                }
             }
 
             Column {
@@ -63,9 +76,16 @@ ColumnLayout {
                         text: modelData
                         readOnly: true
                         selectByMouse: true
+                        style: TextFieldStyle {
+                            background: Rectangle {
+                                color: duplicateView.getRowColor(modelIndex)
+                                border.width: 1
+                            }
+                        }
                     }
                 }
             }
+
         }
     }
 }

@@ -3,14 +3,9 @@
 
 #include "concurrentduplicatefinder.h"
 
-QStringList getListOfFiles(const QDir& dir, bool recursive)
+QList<QFileInfo> getListOfFiles(const QDir& dir, bool recursive)
 {
-    QStringList files = dir.entryList(QDir::Files);
-
-    for (QString& file : files)
-    {
-        file = dir.absoluteFilePath(file);
-    }
+    QList<QFileInfo> files = dir.entryInfoList(QDir::Files);
 
     if (recursive)
     {
@@ -18,7 +13,7 @@ QStringList getListOfFiles(const QDir& dir, bool recursive)
 
         while (iter.hasNext()) {
             QString dirPath = iter.next();
-            files.append(getListOfFiles(QDir(dirPath), recursive));
+            files.append(QDir(dirPath).entryInfoList(QDir::Files));
         }
     }
 
@@ -34,39 +29,40 @@ struct InputParams
 
 struct Task
 {
-    QString leftFilePath;
+    QFileInfo leftFile;
     InputParams params;
 };
 
 struct MappedResult
 {
-    QString leftFile;
+    QFileInfo leftFile;
     QStringList duplicates;
 };
 
 MappedResult mappedFunc(const Task& task)
 {
-    QDirIterator rightDirIterator(task.params.rightDir.path(), QDir::Files, task.params.isRecursive ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags);
+    QDirIterator rightDirIterator(task.params.rightDir.path(), QDir::Files,
+                                  task.params.isRecursive ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags);
 
     QStringList duplicates;
 
     while (rightDirIterator.hasNext()) {
         QString rightFile = rightDirIterator.next();
 
-        if (!task.params.comparator->areTheSame(task.leftFilePath, rightFile))
+        if (!task.params.comparator->areTheSame(task.leftFile.absoluteFilePath(), rightFile))
             continue;
 
         duplicates.append(rightFile);
     }
 
-    return { task.leftFilePath, duplicates };
+    return { task.leftFile, duplicates };
 }
 
 void reduceFunc(QList<QPair<QString, QStringList>>& accumulator, const MappedResult& mappedResult)
 {
     if (!mappedResult.duplicates.empty())
     {
-        accumulator.append({mappedResult.leftFile, mappedResult.duplicates});
+        accumulator.append({mappedResult.leftFile.absoluteFilePath(), mappedResult.duplicates});
     }
 }
 
@@ -79,7 +75,7 @@ QList<QPair<QString, QStringList> > ConcurrentDuplicateFinder::getDuplicates(con
 {
     InputParams params { m_fileComparator.get(), recursive, dirRight };
 
-    QStringList leftFiles = getListOfFiles(dirLeft, recursive);
+    QList<QFileInfo> leftFiles = getListOfFiles(dirLeft, recursive);
     QList<Task> tasks;
 
     for (auto file : leftFiles)

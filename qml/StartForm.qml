@@ -2,8 +2,9 @@ import QtQuick 2.0
 import QtQuick.Layouts 1.12
 import QtQuick.Dialogs 1.3
 import QtQuick.Controls 1.4
+import QtQuick.Controls 2.4 as Controls2
 
-ColumnLayout {
+RowLayout {
     id: startForm
 
     readonly property alias leftDirectoryPath: leftDir.directoryUrl
@@ -18,28 +19,36 @@ ColumnLayout {
 
     spacing: 10
 
-    RowLayout {
-        Layout.alignment: Qt.AlignHCenter
+    Column {
+        Layout.alignment: Qt.AlignJustify
+
+        spacing: 10
 
         DirectoryChooser {
             id: leftDir
+            anchors.right: parent.right
+            anchors.rightMargin: 20
             labelText: qsTr("Left:")
         }
 
         DirectoryChooser {
             id: rightDir
+            anchors.right: parent.right
+            anchors.rightMargin: 20
             labelText: qsTr("Right:")
         }
     }
 
-    RowLayout {
-        Layout.alignment: Qt.AlignHCenter
+    Column {
+        Layout.alignment: Qt.AlignRight
+
+        spacing: 8
 
         Label {
             text: qsTr("Finder:")
         }
 
-        ComboBox {
+        Controls2.ComboBox {
             id: findersCombobox
         }
 
@@ -47,7 +56,7 @@ ColumnLayout {
             text: qsTr("Comparator:")
         }
 
-        ComboBox {
+        Controls2.ComboBox {
             id: comparatorsCombobox
         }
 
@@ -57,11 +66,10 @@ ColumnLayout {
             text: qsTr("Recursive")
             checked: false
         }
-    }
 
-    Button {
-        Layout.alignment: Qt.AlignHCenter
-        text: qsTr("Analyze")
-        onClicked: startForm.started()
+        Button {
+            text: qsTr("Analyze")
+            onClicked: startForm.started()
+        }
     }
 }

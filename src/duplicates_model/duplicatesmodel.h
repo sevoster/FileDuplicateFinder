@@ -1,6 +1,7 @@
 #ifndef DUPLICATEDATAMODEL_H
 #define DUPLICATEDATAMODEL_H
 
+#include <memory>
 #include <QObject>
 #include <QAbstractListModel>
 #include <QUrl>
@@ -26,7 +27,7 @@ class DuplicatesModel : public QAbstractListModel
 public:
     DuplicatesModel(QObject *parent = nullptr);
 
-    Q_INVOKABLE void findDuplicates(const QString &directoryPath, bool recursive);
+    Q_INVOKABLE void findDuplicates(const QString &leftDirPath, const QString &rightDirPath, bool recursive);
     Q_INVOKABLE void initFinder(const QString &finderType, const QString& algoName);
 
     // QAbstractItemModel interface
@@ -57,7 +58,6 @@ private:
     std::unique_ptr<IDuplicateFinder> m_duplicateFinder;
     QList<QStringList> m_duplicateGroups;
     bool m_isRelative;
-    QDir m_workDir;
 
 };
 

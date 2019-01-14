@@ -9,7 +9,7 @@ class IDuplicateFinder
 {
 public:
     virtual ~IDuplicateFinder() = default;
-    virtual QList<QStringList> getDuplicates(const QDir& dir, bool recursive) = 0;
+    virtual QList<QStringList> getDuplicates(const QDir& dirLeft, const QDir& dirRight, bool recursive) = 0;
 };
 
 #endif // IDUPLICATEFINDER_H

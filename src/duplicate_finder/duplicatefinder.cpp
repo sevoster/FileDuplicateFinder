@@ -11,45 +11,41 @@ DuplicateFinder::DuplicateFinder(std::unique_ptr<IFileComparator> fileComparator
 {
 }
 
-QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dir, bool recursive)
+QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dirLeft, const QDir &dirRight, bool recursive)
 {
-    if (!dir.exists())
+    if (!dirLeft.exists() || !dirRight.exists())
     {
         return QList<QStringList>();
     }
 
     QDirIterator::IteratorFlag iterFlag = recursive ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags;
-    QDirIterator dirIterator(dir.path(), QDir::Files, iterFlag);
+    QDirIterator dirLeftIterator(dirLeft.path(), QDir::Files, iterFlag);
 
-    QMap<QString, QStringList> duplicateGroups;
-    QStringList prevUniqueFiles;
+    QList<QStringList> duplicateGroups;
 
-    while (dirIterator.hasNext())
+    while (dirLeftIterator.hasNext())
     {
-        QString filePath = dirIterator.next();
+        QString leftFilePath = dirLeftIterator.next();
+        QStringList newGroup;
 
-        bool isDuplicate = false;
+        QDirIterator dirRightIterator(dirRight.path(), QDir::Files, iterFlag);
 
-        for (auto prevFilePath : prevUniqueFiles)
+        while (dirRightIterator.hasNext())
         {
-            if (m_fileComparator->areTheSame(filePath, prevFilePath))
-            {
-                duplicateGroups[prevFilePath].append(filePath);
-                isDuplicate = true;
-                break;
-            }
+            QString rightFilePath = dirRightIterator.next();
+
+            if (!m_fileComparator->areTheSame(leftFilePath, rightFilePath))
+                continue;
+
+            newGroup.append(rightFilePath);
         }
 
-        if (!isDuplicate)
+        if (!newGroup.empty())
         {
-            prevUniqueFiles.append(filePath);
+            newGroup.append(leftFilePath);
+            duplicateGroups.append(newGroup);
         }
     }
 
-    for (auto origFile : duplicateGroups.keys())
-    {
-        duplicateGroups[origFile].append(origFile);
-    }
-
-    return duplicateGroups.values();
+    return duplicateGroups;
 }

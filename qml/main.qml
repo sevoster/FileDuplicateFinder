@@ -42,7 +42,7 @@ ApplicationWindow {
             findersModel: myModel.finderTypes
             onStarted: {
                 myModel.initFinder(chosenFinder, chosenComparator)
-                myModel.findDuplicates(directoryPath, isRecursive)
+                myModel.findDuplicates(leftDirectoryPath, rightDirectoryPath, isRecursive)
             }
         }
 

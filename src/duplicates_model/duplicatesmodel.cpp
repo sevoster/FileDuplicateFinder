@@ -11,8 +11,8 @@ QMap<QString, std::function<IFileComparator*()>> DuplicatesModel::comparerAlgos 
 };
 
 QMap<QString, std::function<IDuplicateFinder*(std::unique_ptr<IFileComparator>)>> DuplicatesModel::finderTypes = {
-{"All", [] (std::unique_ptr<IFileComparator> comparator) { return new DuplicateFinder(std::move(comparator)); }},
-{"Per Directory", [] (std::unique_ptr<IFileComparator> comparator) { return new ConcurrentDuplicateFinder(std::move(comparator)); }}
+{"Sequential", [] (std::unique_ptr<IFileComparator> comparator) { return new DuplicateFinder(std::move(comparator)); }},
+{"Concurrent", [] (std::unique_ptr<IFileComparator> comparator) { return new ConcurrentDuplicateFinder(std::move(comparator)); }}
 };
 
 DuplicatesModel::DuplicatesModel(QObject *parent) : QAbstractListModel (parent), m_duplicateFinder(nullptr), m_isRelative(false)
@@ -20,7 +20,7 @@ DuplicatesModel::DuplicatesModel(QObject *parent) : QAbstractListModel (parent),
     connect(this, SIGNAL(isRelativeChanged()), this, SLOT(onIsRelativeChanged()));
 }
 
-void DuplicatesModel::findDuplicates(const QString &directoryPath, bool recursive)
+void DuplicatesModel::findDuplicates(const QString &leftDirPath, const QString &rightDirPath, bool recursive)
 {
     beginResetModel();
     m_duplicateGroups.clear();
@@ -32,17 +32,20 @@ void DuplicatesModel::findDuplicates(const QString &directoryPath, bool recursiv
         return;
     }
 
-    QUrl directoryUrl = QUrl::fromUserInput(directoryPath);
+    QUrl leftUrl = QUrl::fromUserInput(leftDirPath);
+    QUrl rightUrl = QUrl::fromUserInput(rightDirPath);
 
-    if (!directoryUrl.isValid() || directoryUrl.isEmpty() || !directoryUrl.isLocalFile())
+    if (!leftUrl.isValid() || leftUrl.isEmpty() || !leftUrl.isLocalFile() || !rightUrl.isValid() || rightUrl.isEmpty() || !rightUrl.isLocalFile())
     {
         submitMessage("Path is not valid", MessageType::Error);
         endResetModel();
         return;
     }
 
-    m_workDir = QDir(directoryUrl.toLocalFile());
-    if (!m_workDir.exists())
+    QDir leftDir(leftUrl.toLocalFile());
+    QDir rightDir(rightUrl.toLocalFile());
+
+    if (!leftDir.exists() || !rightDir.exists())
     {
         submitMessage("Directory does not exist", MessageType::Error);
         endResetModel();
@@ -52,7 +55,7 @@ void DuplicatesModel::findDuplicates(const QString &directoryPath, bool recursiv
     bool exception = false;
 
     try {
-        m_duplicateGroups = m_duplicateFinder->getDuplicates(m_workDir, recursive);
+        m_duplicateGroups = m_duplicateFinder->getDuplicates(leftDir, rightDir, recursive);
     } catch (const std::runtime_error& e) {
         submitMessage(e.what(), MessageType::Error);
         exception = true;
@@ -166,11 +169,11 @@ void DuplicatesModel::submitMessage(const QString &message, MessageType type)
 
 void DuplicatesModel::updatePaths()
 {
-    for (auto& group : m_duplicateGroups)
-    {
-        for (auto& filePath : group)
-        {
-            filePath = m_isRelative ? m_workDir.relativeFilePath(filePath) : m_workDir.absoluteFilePath(filePath);
-        }
-    }
+//    for (auto& group : m_duplicateGroups)
+//    {
+//        for (auto& filePath : group)
+//        {
+//            filePath = m_isRelative ? m_workDir.relativeFilePath(filePath) : m_workDir.absoluteFilePath(filePath);
+//        }
+//    }
 }

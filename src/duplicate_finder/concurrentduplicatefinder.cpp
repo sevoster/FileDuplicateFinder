@@ -38,7 +38,13 @@ struct Task
     InputParams params;
 };
 
-QStringList mappedFunc(const Task& task)
+struct MappedResult
+{
+    QString leftFile;
+    QStringList duplicates;
+};
+
+MappedResult mappedFunc(const Task& task)
 {
     QDirIterator rightDirIterator(task.params.rightDir.path(), QDir::Files, task.params.isRecursive ? QDirIterator::IteratorFlag::Subdirectories : QDirIterator::IteratorFlag::NoIteratorFlags);
 
@@ -53,19 +59,14 @@ QStringList mappedFunc(const Task& task)
         duplicates.append(rightFile);
     }
 
-    if (!duplicates.empty())
-    {
-        duplicates.append(task.leftFilePath);
-    }
-
-    return duplicates;
+    return { task.leftFilePath, duplicates };
 }
 
-void reduceFunc(QList<QStringList>& accumulator, const QStringList& duplicateGroups)
+void reduceFunc(QList<QPair<QString, QStringList>>& accumulator, const MappedResult& mappedResult)
 {
-    if (!duplicateGroups.empty())
+    if (!mappedResult.duplicates.empty())
     {
-        accumulator.append(duplicateGroups);
+        accumulator.append({mappedResult.leftFile, mappedResult.duplicates});
     }
 }
 
@@ -74,7 +75,7 @@ ConcurrentDuplicateFinder::ConcurrentDuplicateFinder(std::unique_ptr<IFileCompar
 
 }
 
-QList<QStringList> ConcurrentDuplicateFinder::getDuplicates(const QDir &dirLeft, const QDir &dirRight, bool recursive)
+QList<QPair<QString, QStringList> > ConcurrentDuplicateFinder::getDuplicates(const QDir &dirLeft, const QDir &dirRight, bool recursive)
 {
     InputParams params { m_fileComparator.get(), recursive, dirRight };
 

@@ -12,7 +12,7 @@ public:
     DuplicateFinder(std::unique_ptr<IFileComparator> fileComparator);
 
     // IDuplicateFinder interface
-    virtual QList<QStringList> getDuplicates(const QDir& dirLeft, const QDir& dirRight, bool recursive) override;
+    virtual QList<QPair<QString, QStringList>> getDuplicates(const QDir& dirLeft, const QDir& dirRight, bool recursive) override;
 
 protected:
     std::unique_ptr<IFileComparator> m_fileComparator;

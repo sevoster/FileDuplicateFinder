@@ -11,17 +11,17 @@ DuplicateFinder::DuplicateFinder(std::unique_ptr<IFileComparator> fileComparator
 {
 }
 
-QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dirLeft, const QDir &dirRight, bool recursive)
+QList<QPair<QString, QStringList> > DuplicateFinder::getDuplicates(const QDir &dirLeft, const QDir &dirRight, bool recursive)
 {
     if (!dirLeft.exists() || !dirRight.exists())
     {
-        return QList<QStringList>();
+        return QList<QPair<QString, QStringList>>();
     }
 
     QDirIterator::IteratorFlag iterFlag = recursive ? QDirIterator::Subdirectories : QDirIterator::NoIteratorFlags;
     QDirIterator dirLeftIterator(dirLeft.path(), QDir::Files, iterFlag);
 
-    QList<QStringList> duplicateGroups;
+    QList<QPair<QString, QStringList>> duplicateGroups;
 
     while (dirLeftIterator.hasNext())
     {
@@ -42,8 +42,7 @@ QList<QStringList> DuplicateFinder::getDuplicates(const QDir &dirLeft, const QDi
 
         if (!newGroup.empty())
         {
-            newGroup.append(leftFilePath);
-            duplicateGroups.append(newGroup);
+            duplicateGroups.append({leftFilePath, newGroup});
         }
     }
 

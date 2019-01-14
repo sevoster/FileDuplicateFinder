@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     DuplicatesModel model;
 
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty("myModel", &model);
+    engine.rootContext()->setContextProperty("duplicateModel", &model);
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;

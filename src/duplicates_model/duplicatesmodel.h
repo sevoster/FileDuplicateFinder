@@ -11,7 +11,8 @@
 
 enum DuplicateDataRoles
 {
-    DuplicateGroup = Qt::UserRole + 1
+    RightDuplicateGroup = Qt::UserRole + 1,
+    LeftFile
 };
 
 class DuplicatesModel : public QAbstractListModel
@@ -56,9 +57,10 @@ private:
     void updatePaths();
 
     std::unique_ptr<IDuplicateFinder> m_duplicateFinder;
-    QList<QStringList> m_duplicateGroups;
+    QList<QPair<QString, QStringList>> m_duplicateGroups;
     bool m_isRelative;
-
+    QDir m_leftDir;
+    QDir m_rightDir;
 };
 
 #endif // DUPLICATEDATAMODEL_H

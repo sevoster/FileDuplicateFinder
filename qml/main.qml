@@ -22,7 +22,7 @@ ApplicationWindow {
             id: label
 
             Connections {
-                target: myModel
+                target: duplicateModel
                 onSubmittedMessage: {
                     label.text = message
                 }
@@ -38,11 +38,11 @@ ApplicationWindow {
         StartForm {
             id: startForm
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
-            comparatorsModel: myModel.comparatorNames
-            findersModel: myModel.finderTypes
+            comparatorsModel: duplicateModel.comparatorNames
+            findersModel: duplicateModel.finderTypes
             onStarted: {
-                myModel.initFinder(chosenFinder, chosenComparator)
-                myModel.findDuplicates(leftDirectoryPath, rightDirectoryPath, isRecursive)
+                duplicateModel.initFinder(chosenFinder, chosenComparator)
+                duplicateModel.findDuplicates(leftDirectoryPath, rightDirectoryPath, isRecursive)
             }
         }
 
@@ -50,10 +50,10 @@ ApplicationWindow {
             id: duplicateListView
             Layout.fillWidth: true
             Layout.fillHeight: true
-            model: myModel
+            model: duplicateModel
 
             onIsRelativePathChanged: {
-                myModel.isRelative = isRelativePath
+                duplicateModel.isRelative = isRelativePath
             }
         }
     }

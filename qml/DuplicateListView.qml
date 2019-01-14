@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.12
-import QtQuick.Controls 2.4
+import QtQuick.Controls 1.4
 
 ColumnLayout {
     property alias model: duplicateView.model
@@ -46,7 +46,7 @@ ColumnLayout {
             Text {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
-                text: "Group " + index
+                text: leftFile
                 font.bold: true
                 font.pointSize: 10
             }
@@ -56,7 +56,7 @@ ColumnLayout {
             }
 
             Repeater {
-                model: duplicateGroup
+                model: rightDuplicateGroup
 
                 delegate: TextField {
                     width: duplicateGroupText.width
@@ -67,7 +67,5 @@ ColumnLayout {
                 }
             }
         }
-
-        ScrollBar.vertical: ScrollBar {}
     }
 }

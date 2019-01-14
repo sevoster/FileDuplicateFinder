@@ -42,10 +42,10 @@ void DuplicatesModel::findDuplicates(const QString &leftDirPath, const QString &
         return;
     }
 
-    QDir leftDir(leftUrl.toLocalFile());
-    QDir rightDir(rightUrl.toLocalFile());
+    m_leftDir = QDir(leftUrl.toLocalFile());
+    m_rightDir = QDir(rightUrl.toLocalFile());
 
-    if (!leftDir.exists() || !rightDir.exists())
+    if (!m_leftDir.exists() || !m_rightDir.exists())
     {
         submitMessage("Directory does not exist", MessageType::Error);
         endResetModel();
@@ -55,7 +55,7 @@ void DuplicatesModel::findDuplicates(const QString &leftDirPath, const QString &
     bool exception = false;
 
     try {
-        m_duplicateGroups = m_duplicateFinder->getDuplicates(leftDir, rightDir, recursive);
+        m_duplicateGroups = m_duplicateFinder->getDuplicates(m_leftDir, m_rightDir, recursive);
     } catch (const std::runtime_error& e) {
         submitMessage(e.what(), MessageType::Error);
         exception = true;
@@ -116,8 +116,10 @@ QVariant DuplicatesModel::data(const QModelIndex &index, int role) const
 
     int row = index.row();
     switch (role) {
-    case DuplicateDataRoles::DuplicateGroup:
-        return m_duplicateGroups[row];
+    case DuplicateDataRoles::RightDuplicateGroup:
+        return m_duplicateGroups[row].second;
+    case DuplicateDataRoles::LeftFile:
+        return m_duplicateGroups[row].first;
     }
 
     return QVariant();
@@ -126,7 +128,8 @@ QVariant DuplicatesModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> DuplicatesModel::roleNames() const
 {
     QHash<int, QByteArray> roles = QAbstractListModel::roleNames();
-    roles[DuplicateDataRoles::DuplicateGroup] = "duplicateGroup";
+    roles[DuplicateDataRoles::RightDuplicateGroup] = "rightDuplicateGroup";
+    roles[DuplicateDataRoles::LeftFile] = "leftFile";
     return roles;
 }
 
@@ -169,11 +172,12 @@ void DuplicatesModel::submitMessage(const QString &message, MessageType type)
 
 void DuplicatesModel::updatePaths()
 {
-//    for (auto& group : m_duplicateGroups)
-//    {
-//        for (auto& filePath : group)
-//        {
-//            filePath = m_isRelative ? m_workDir.relativeFilePath(filePath) : m_workDir.absoluteFilePath(filePath);
-//        }
-//    }
+    for (auto& group : m_duplicateGroups)
+    {
+        group.first = m_isRelative ? m_leftDir.relativeFilePath(group.first) : m_leftDir.absoluteFilePath(group.first);
+        for (auto& filePath : group.second)
+        {
+            filePath = m_isRelative ? m_rightDir.relativeFilePath(filePath) : m_rightDir.absoluteFilePath(filePath);
+        }
+    }
 }

@@ -22,7 +22,7 @@ make
 
 ## Usage
 * Run DuplicateFinder
-* Choose directory
+* Choose directories
 * Choose finder
   * __Sequential__ - find duplicates sequentially
   * __Concurrent__ - find duplicates in parallel (per file in left folder)

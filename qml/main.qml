@@ -46,11 +46,11 @@ ApplicationWindow {
             }
         }
 
-        DuplicateListView {
+        DuplicatesView {
             id: duplicateListView
             Layout.fillWidth: true
             Layout.fillHeight: true
-            model: duplicateModel
+            duplicatesModel: duplicateModel
 
             onIsRelativePathChanged: {
                 duplicateModel.isRelative = isRelativePath

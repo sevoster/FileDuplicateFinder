@@ -3,7 +3,7 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 1.4
 
 ColumnLayout {
-    property alias model: duplicateView.model
+    property var duplicatesModel: null
     property alias isRelativePath: isRelative.checked
 
     Item {
@@ -35,35 +35,35 @@ ColumnLayout {
         Layout.fillHeight: true
 
         clip: true
+        model: duplicateModel
 
         spacing: 25
 
-        delegate: Column {
+        delegate: Row {
             id: duplicateGroupText
             clip: true
             width: parent.width
 
-            Text {
-                width: parent.width
-                horizontalAlignment: Text.AlignHCenter
+            TextField {
                 text: leftFile
-                font.bold: true
-                font.pointSize: 10
-            }
-            Item {
-                width: parent.width
-                height: 20
+                width: duplicateGroupText.width / 2
+                readOnly: true
+                selectByMouse: true
             }
 
-            Repeater {
-                model: rightDuplicateGroup
+            Column {
+                id: duplicateColumn
+                width: duplicateGroupText.width / 2
 
-                delegate: TextField {
-                    width: duplicateGroupText.width
-                    text: modelData
-                    readOnly: true
-                    selectByMouse: true
-                    horizontalAlignment: Text.AlignHCenter
+                Repeater {
+                    model: rightDuplicateGroup
+
+                    delegate: TextField {
+                        width: duplicateColumn.width
+                        text: modelData
+                        readOnly: true
+                        selectByMouse: true
+                    }
                 }
             }
         }

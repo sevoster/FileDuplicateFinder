@@ -2,7 +2,7 @@
     <qresource prefix="/">
         <file>qml/main.qml</file>
         <file>qml/StartForm.qml</file>
-        <file>qml/DuplicateListView.qml</file>
+        <file>qml/DuplicatesView.qml</file>
         <file>qml/DirectoryChooser.qml</file>
     </qresource>
 </RCC>

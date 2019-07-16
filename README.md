@@ -4,7 +4,7 @@ Application to find file duplicates in two directories
 ## Prerequisites
 * CMake >= 3.1
 * Qt 5.12
-
+Gdhdhd
 ## How to build
 * Create build directory inside repo folder
 ```shell
